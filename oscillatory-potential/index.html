@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+            integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+            crossorigin="anonymous">
+    <title>Oscillatory potential</title>
+</head>
+<body>
+    <p class="text-center h2">Осциляторный потенциал</p>
+    <div class="text-center align-items-center justify-content-center" id="plot"></div>
+    <div class="container">
+        <form class="border rounded text-bg-light p-2">
+            <div class="mb-3">
+                <label class="form-label">w</label>
+                <input id="w"  value="1" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">n</label>
+                <input id="n"  value="5" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <button type="button" onclick="buildPlot()" class="btn btn-primary">
+                    Построить график
+                </button>
+            </div>
+        </form>
+    </div>
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script>
+        const h = 1;
+        const color = '#80CAF6';
+
+        Plotly.newPlot('plot', [{
+            x: [0],
+            y: [0],
+            mode: 'lines',
+            line: {color}
+        }]);
+
+        function buildPlot() {
+            let w = parseFloat(document.getElementById('w').value);
+            let n = parseInt(document.getElementById('n').value);
+
+            let y = _.range(-n,n+1).map(e => (Math.abs(e)+0.5)*h*w);
+            let x = _.range(-n,n+1).map(e => e/((Math.abs(e)+0.5)*h*w));
+
+            let lines = _.range(n+1).map(e => ({
+                type: 'line',
+                xref: 'x',
+                yref: 'y',
+                x0: -x[e],
+                y0: y[e],
+                x1: x[e],
+                y1: y[e],
+                line: {
+                    color,
+                    width: 1
+                }
+            }));
+
+            y = _.range(-n,n+0.1,0.1).map(e => (Math.abs(e)+0.5)*h*w);
+            x = _.range(-n,n+0.1,0.1).map(e => e/((Math.abs(e)+0.5)*h*w));
+
+            Plotly.update('plot', {
+                x: [x],
+                y: [y]
+                }, {
+                    shapes: lines
+                })
+        }
+    </script>
+</body>
+</html>

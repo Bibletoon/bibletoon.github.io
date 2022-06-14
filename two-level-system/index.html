@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.7/dist/uPlot.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <p class="text-center h2">Двухуровневая система</p>
+    <div class="text-center align-items-center justify-content-center" id="plot"></div>
+    <div class="container">
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Probability C1(0)</label>
+                <input id="c1"  value="1" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Probability C2(0)</label>
+                <input id="c2" value="0" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">dt</label>
+                <input id="dt" value="0.0001" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">delta</label>
+                <input id="delta" value="0.1" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Omega_R</label>
+                <input id="omega_r" value="1" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">gamma</label>
+                <input id="gamma" value="0" type="number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <button type="button" onclick="start()" class="btn btn-primary">
+                    Start
+                </button>
+                <button type="button" onclick="stop()" class="btn btn-danger">
+                    Stop
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.1/math.js"
+        integrity="sha512-qBGHnIjw1CTZC0Vpshjjb4StUqVHm8LqqE4cco3FdEu1lS+gpXv/HON5qNjNq5mVnIlZPABGqkGksRrV6NZx+A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="js/index.js"></script>
+</body>
+</html>
