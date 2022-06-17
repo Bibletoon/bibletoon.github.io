@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+          crossorigin="anonymous">
+  <title>Model 2</title>
+</head>
+<body>
+<p class="h1 text-center">Модель Кронига-Пени</p>
+<div class="text-center align-items-center justify-content-center" id="plot"></div>
+<div class="container">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a id="zones-link" class="nav-link active" aria-current="page" onclick="setModeToZone()">Levels</a>
+    </li>
+    <li class="nav-item">
+      <a id="energy-link" class="nav-link" onclick="setModeToEnergy()">Energy</a>
+    </li>
+  </ul>
+  <form id="zones" class="border rounded text-bg-light p-2">
+    <div class="mb-3">
+      <label class="form-label">K</label>
+      <input id="k"  value="1" type="number" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Delta x</label>
+      <input id="dx"  value="5" type="number" class="form-control">
+    </div>
+    <div class="mb-3">
+      <button type="button" onclick="buildZonePlot()" class="btn btn-primary">
+        Построить график
+      </button>
+    </div>
+  </form>
+  <form style="display: none" id="energy" class="border rounded text-bg-light p-2">
+    <div class="mb-3">
+      <label class="form-label">a</label>
+      <input id="a"  value="1" type="number" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">n</label>
+      <input id="n"  value="2" type="number" class="form-control">
+    </div>
+    <div class="mb-3">
+      <button type="button" onclick="buildEnergyPlot()" class="btn btn-primary">
+        Построить график
+      </button>
+    </div>
+  </form>
+</div>
+<script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<script>
+  const m = 9.1 *10e-31;
+  const h = 6.6 *10e-34;
+  const color = '#80CAF6';
+
+  Plotly.newPlot('plot', [{
+    x: [0],
+    y: [0],
+    mode: 'lines',
+    line: {color}
+  }]);
+
+  function buildZonePlot() {
+    let k = parseFloat(document.getElementById('k').value);
+    let dx = parseInt(document.getElementById('dx').value);
+
+    let x = _.range(-dx, dx+0.001, 0.001);
+    let y = x.map(xv => xv===0 ? Math.cos(xv) : Math.cos(xv)+k*Math.sin(xv)/xv)
+    let shapes = [
+      {
+        type: 'line',
+        x0: -dx,
+        y0: 1,
+        x1: dx,
+        y1: 1,
+        line: {
+          color: '#80f682',
+          width: 2
+        }
+      },
+      {
+        type: 'line',
+        x0: -dx,
+        y0: -1,
+        x1: dx,
+        y1: -1,
+        line: {
+          color: '#80f682',
+          width: 2
+        }
+      }
+    ]
+
+    let startRectX = -dx;
+    let lastWasTrue = false;
+
+    for (let i = 0; i < y.length; i++) {
+      if (Math.abs(y[i])-1 > 0.001  && lastWasTrue) {
+        shapes.push({
+          type: 'rect',
+          xref: 'x',
+          yref: 'y',
+          x0: startRectX,
+          y0: 1,
+          x1: x[i],
+          y1: -1,
+          fillcolor: '#fff200',
+          opacity: 0.3,
+          line: {
+            width: 0
+          }
+        });
+        lastWasTrue = false;
+      } else if (Math.abs(y[i])-1 < 0.001 && !lastWasTrue) {
+        lastWasTrue = true;
+        startRectX = x[i];
+      }
+    }
+
+    if (lastWasTrue) {
+      shapes.push({
+        type: 'rect',
+        xref: 'x',
+        yref: 'y',
+        x0: startRectX,
+        y0: 1,
+        x1: x[x.length-1],
+        y1: -1,
+        fillcolor: '#fff200',
+        opacity: 0.3,
+        line: {
+          width: 0
+        }
+      });
+    }
+
+    Plotly.update('plot', {
+      x: [x],
+      y: [y]
+    },{
+      shapes
+      })
+  }
+
+  function buildEnergyPlot() {
+      let a = parseFloat(document.getElementById("a").value);
+      let n = parseFloat(document.getElementById("n").value);
+      console.log(n)
+      let x = []
+      let y = []
+      for (let i = 2; i < n+1; i++) {
+        let sign = 1;
+        let shift = (i - 1) * 2.5;
+        for (let k = -i*Math.PI; k < -(i-1)*Math.PI; k+= 0.01) {
+            x.push(k);
+            y.push(shift + k*k * h*h / (2 * m) + Math.cos(k * a) * sign);
+        }
+
+        x.push(null)
+        y.push(null)
+
+        for (let k=(i - 1)*Math.PI/a; k < i*Math.PI/a; k+=0.01) {
+            x.push(k);
+            y.push(shift + k*k * h*h / (2 * m) + Math.cos(k * a)*sign);
+        }
+
+        x.push(null)
+        y.push(null)
+      }
+
+
+
+      for (let k=-Math.PI/a; k< Math.PI/a; k+= 0.01) {
+        x.push(k);
+        y.push(k*k * h*h /(2*m) - Math.cos(k*a));
+      }
+
+      Plotly.update('plot', {
+        x: [x],
+        y: [y]
+      }, {
+        shapes: []
+      })
+  }
+
+  function setModeToZone() {
+    document.getElementById("zones-link").classList.add('active');
+    document.getElementById("energy-link").classList.remove('active');
+    document.getElementById("zones").style.display = "block";
+    document.getElementById("energy").style.display = "none";
+  }
+
+  function setModeToEnergy() {
+    document.getElementById("energy-link").classList.add('active');
+    document.getElementById("zones-link").classList.remove('active');
+    document.getElementById("zones").style.display = "none";
+    document.getElementById("energy").style.display = "block";
+  }
+</script>
+</body>
+</html>
